@@ -48,6 +48,8 @@ class Pacman(Sprite):
         self.c = c
         self.maze = maze
 
+        self.dot_eaten_observers = []
+
         self.direction = DIR_STILL
         self.next_direction = DIR_STILL
 
@@ -62,7 +64,12 @@ class Pacman(Sprite):
 
             if self.maze.has_dot_at(r, c):
                 self.maze.eat_dot_at(r, c)
+
                 self.state.random_upgrade()
+
+
+                print(self.dot_eaten_observers)
+                self.dot_eaten_observers[0]()
 
             
             if self.maze.is_movable_direction(r, c, self.next_direction):
@@ -83,6 +90,7 @@ class Pacman(Sprite):
         self.next_direction = direction
 
 
+
 class PacmanGame(GameApp):
     def init_game(self):
         self.maze = Maze(self, CANVAS_WIDTH, CANVAS_HEIGHT)
@@ -93,9 +101,14 @@ class PacmanGame(GameApp):
         self.pacman1_score_text = Text(self, 'P1: 0', 100, 20)
         self.pacman2_score_text = Text(self, 'P2: 0', 600, 20)
 
+        self.pacman1.dot_eaten_observers.append(self.dot_eaten_by_pacman1)
+        self.pacman2.dot_eaten_observers.append(self.dot_eaten_by_pacman2)
+
         self.elements.append(self.pacman1)
         self.elements.append(self.pacman2)
 
+        self.pacman1_score = -1
+        self.pacman2_score = -1
         self.command_map = {
             'W': self.get_pacman_next_direction_function(self.pacman1, DIR_UP),
             'A': self.get_pacman_next_direction_function(self.pacman1, DIR_LEFT),
@@ -149,6 +162,22 @@ class PacmanGame(GameApp):
         #     self.pacman2.set_next_direction(DIR_DOWN)
         # elif event.char.upper() == 'L':
         #     self.pacman2.set_next_direction(DIR_RIGHT)
+
+    def update_scores(self):
+        self.pacman1_score_text.set_text(f'P1: {self.pacman1_score}')
+        self.pacman2_score_text.set_text(f'P2: {self.pacman2_score}')
+
+    def dot_eaten_by_pacman1(self):
+        self.pacman1_score += 1
+        self.update_scores()
+
+    def dot_eaten_by_pacman2(self):
+        self.pacman2_score += 1
+        self.update_scores()
+
+
+
+
 
 if __name__ == "__main__":
     root = tk.Tk()
