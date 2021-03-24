@@ -64,11 +64,7 @@ class Pacman(Sprite):
 
             if self.maze.has_dot_at(r, c):
                 self.maze.eat_dot_at(r, c)
-
                 self.state.random_upgrade()
-
-
-                print(self.dot_eaten_observers)
                 self.dot_eaten_observers[0]()
 
             
